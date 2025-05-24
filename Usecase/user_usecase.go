@@ -24,16 +24,16 @@ func NewUserUseCase(userRepo domain.UserRepository) domain.UserUseCase {
 	}
 }
 
-func (u *userUseCase) Register(user *domain.User) error {
+func (u *userUseCase) Register(user *domain.User) (*domain.User, error) {
 	// Check if user already exists
 	existingUser, err := u.userRepo.FindByEmail(user.Email)
 	if err != nil {
 		log.Printf("Error checking existing user: %v", err)
-		return err
+		return nil, err
 	}
 	if existingUser != nil {
 		log.Printf("User already exists with email: %s", user.Email)
-		return errors.New("user already exists")
+		return nil, errors.New("user already exists")
 	}
 
 	// Log original password
@@ -44,7 +44,7 @@ func (u *userUseCase) Register(user *domain.User) error {
 	hashedPassword, err := u.passwordService.PasswordHasher(user.Password)
 	if err != nil {
 		log.Printf("Error hashing password: %v", err)
-		return err
+		return nil, err
 	}
 	user.Password = hashedPassword
 
@@ -52,15 +52,26 @@ func (u *userUseCase) Register(user *domain.User) error {
 	log.Printf("Hashed password: %s", user.Password)
 	log.Printf("Hashed password length: %d", len(user.Password))
 
+	//defaults for bio, profile pic and settings
+	user.Bio = ""
+	user.ProfilePic = "https://avatar.iran.liara.run/public/1"
+	user.Settings = domain.UserSettings{
+		Theme:                "light",
+		Language:             "en",
+		EmailNotifications:   false,
+		BrowserNotifications: false,
+		MobileNotifications:  false,
+	}
+
 	// Create user
 	err = u.userRepo.Create(user)
 	if err != nil {
 		log.Printf("Error creating user: %v", err)
-		return err
+		return nil, err
 	}
 
 	log.Printf("User created successfully: %s", user.Email)
-	return nil
+	return user, nil
 }
 
 func (u *userUseCase) Login(email, password string) (string, error) {
@@ -69,8 +80,8 @@ func (u *userUseCase) Login(email, password string) (string, error) {
 		return "", err
 	}
 
-	if !u.VerifyPassword(user.Password, password) {
-		return "", errors.New("invalid password")
+	if u.VerifyPassword(user.Password, password) {
+		return "", errors.New("invalid credentials")
 	}
 
 	return u.GenerateToken(user)
@@ -88,7 +99,7 @@ func (u *userUseCase) GetUserByEmail(email string) (*domain.User, error) {
 }
 
 func (u *userUseCase) VerifyPassword(hash, password string) bool {
-	return u.passwordService.PasswordComparator(hash, password)
+	return !u.passwordService.PasswordComparator(hash, password)
 }
 
 func (u *userUseCase) GenerateToken(user *domain.User) (string, error) {

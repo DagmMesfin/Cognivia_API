@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 
 	domain "cognivia-api/Domain"
@@ -26,18 +27,16 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	if err := h.userUseCase.Register(&user); err != nil {
+	registeredUser, err := h.userUseCase.Register(&user)
+
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User registered successfully",
-		"user": gin.H{
-			"id":    user.ID.Hex(),
-			"email": user.Email,
-			"name":  user.Name,
-		},
+		"user":    registeredUser,
 	})
 }
 
@@ -59,6 +58,8 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
+	log.Default().Printf("User retrieved from database: %+v", user)
+
 	// Verify password
 	if !h.userUseCase.VerifyPassword(user.Password, loginRequest.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
@@ -74,11 +75,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": token,
-		"user": gin.H{
-			"id":    user.ID.Hex(),
-			"email": user.Email,
-			"name":  user.Name,
-		},
+		"user":  user,
 	})
 }
 

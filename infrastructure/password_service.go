@@ -1,6 +1,8 @@
 package infrastructure
 
 import (
+	"log"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -24,5 +26,9 @@ func (s *passwordService) PasswordHasher(password string) (string, error) {
 }
 
 func (s *passwordService) PasswordComparator(hash, password string) bool {
-	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) != nil
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+
+	log.Printf("Password comparison error: %v", err)
+
+	return err != nil
 }
