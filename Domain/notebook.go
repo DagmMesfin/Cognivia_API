@@ -20,6 +20,14 @@ type Notebook struct {
 	UpdatedAt       time.Time           `bson:"updated_at" json:"updated_at"`
 }
 
+type UpdateRequest struct {
+	Name            string  `json:"name"`
+	Icon            string  `json:"icon"`
+	Color           string  `json:"color"`
+	Type            string  `json:"type"`
+	GoogleDriveLink *string `json:"google_drive_link"`
+}
+
 type NotebookRepository interface {
 	Create(notebook *Notebook) error
 	GetByID(id primitive.ObjectID) (*Notebook, error)
@@ -35,7 +43,7 @@ type NotebookUseCase interface {
 	GetNotebooksByUserID(userID string) ([]*Notebook, error)
 	GetSnapnotes(userID string, notebookID string) (*Snapnotes, error)
 	GetPrepPilot(userID string, notebookID string) (*PrepPilot, error)
-	UpdateNotebook(userID string, notebookID string, notebook *Notebook) error
+	UpdateNotebook(notebookID string, notebook UpdateRequest) error
 	DeleteNotebook(userID string, notebookID string) error
 	// Add other use case methods as needed
 }

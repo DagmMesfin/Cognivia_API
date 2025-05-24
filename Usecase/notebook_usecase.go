@@ -63,12 +63,7 @@ func (u *notebookUseCase) GetNotebookByID(userID string, notebookID string) (*do
 	return notebook, nil
 }
 
-func (u *notebookUseCase) UpdateNotebook(userID string, notebookID string, notebook *domain.Notebook) error {
-	objectUserID, err := primitive.ObjectIDFromHex(userID)
-	if err != nil {
-		return err
-	}
-
+func (u *notebookUseCase) UpdateNotebook(notebookID string, notebook domain.UpdateRequest) error {
 	objectNotebookID, err := primitive.ObjectIDFromHex(notebookID)
 	if err != nil {
 		return err
@@ -79,16 +74,26 @@ func (u *notebookUseCase) UpdateNotebook(userID string, notebookID string, noteb
 		return err
 	}
 
-	if existingNotebook == nil || existingNotebook.UserID != objectUserID {
-		return errors.New("notebook not found or does not belong to user")
+	if existingNotebook == nil {
+		return errors.New("notebook not found")
 	}
 
 	// Update allowed fields
-	existingNotebook.Name = notebook.Name
-	existingNotebook.Icon = notebook.Icon
-	existingNotebook.Color = notebook.Color
-	existingNotebook.Type = notebook.Type
-	existingNotebook.GoogleDriveLink = notebook.GoogleDriveLink
+	if notebook.Name != "" {
+		existingNotebook.Name = notebook.Name
+	}
+	if notebook.Icon != "" {
+		existingNotebook.Icon = notebook.Icon
+	}
+	if notebook.Color != "" {
+		existingNotebook.Color = notebook.Color
+	}
+	if notebook.Type != "" {
+		existingNotebook.Type = notebook.Type
+	}
+	if notebook.GoogleDriveLink != nil {
+		existingNotebook.GoogleDriveLink = notebook.GoogleDriveLink
+	}
 
 	return u.notebookRepo.Update(existingNotebook)
 }

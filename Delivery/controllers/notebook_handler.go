@@ -84,22 +84,16 @@ func (h *NotebookHandler) GetNotebooksByUserID(c *gin.Context) {
 }
 
 func (h *NotebookHandler) UpdateNotebook(c *gin.Context) {
-	// Extract user ID from context
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})
-		return
-	}
-
 	notebookID := c.Param("id")
 
-	var notebook domain.Notebook
-	if err := c.ShouldBindJSON(&notebook); err != nil {
+	updateReq := domain.UpdateRequest{}
+
+	if err := c.ShouldBindJSON(&updateReq); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := h.notebookUseCase.UpdateNotebook(userID.(string), notebookID, &notebook); err != nil {
+	if err := h.notebookUseCase.UpdateNotebook(notebookID, updateReq); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
