@@ -163,7 +163,7 @@ func (u *notebookUseCase) GetSnapnotes(userID string, notebookID string) (*domai
 		return nil, errors.New("notebook not found or does not belong to user")
 	}
 
-	if notebook.SnapnotesID.IsZero() {
+	if notebook.SnapnotesID == nil {
 		return nil, errors.New("no snapnotes associated with this notebook")
 	}
 
@@ -190,7 +190,7 @@ func (u *notebookUseCase) GetPrepPilot(userID string, notebookID string) (*domai
 		return nil, errors.New("notebook not found or does not belong to user")
 	}
 
-	if notebook.PrepPilotID.IsZero() {
+	if notebook.PrepPilotID == nil {
 		return nil, errors.New("no prep pilot associated with this notebook")
 	}
 
