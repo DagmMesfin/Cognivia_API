@@ -79,20 +79,34 @@ func (u *notebookUseCase) UpdateNotebook(notebookID string, notebook domain.Upda
 	}
 
 	// Update allowed fields
-	if notebook.Name != "" {
-		existingNotebook.Name = notebook.Name
+	if notebook.Name != nil {
+		existingNotebook.Name = *notebook.Name
 	}
-	if notebook.Icon != "" {
-		existingNotebook.Icon = notebook.Icon
+	if notebook.Icon != nil {
+		existingNotebook.Icon = *notebook.Icon
 	}
-	if notebook.Color != "" {
-		existingNotebook.Color = notebook.Color
+	if notebook.Color != nil {
+		existingNotebook.Color = *notebook.Color
 	}
-	if notebook.Type != "" {
-		existingNotebook.Type = notebook.Type
+	if notebook.Type != nil {
+		existingNotebook.Type = *notebook.Type
 	}
 	if notebook.GoogleDriveLink != nil {
 		existingNotebook.GoogleDriveLink = notebook.GoogleDriveLink
+	}
+	if notebook.SnapnotesID != nil {
+		snapnotesID, err := primitive.ObjectIDFromHex(*notebook.SnapnotesID)
+		if err != nil {
+			return err
+		}
+		existingNotebook.SnapnotesID = &snapnotesID
+	}
+	if notebook.PrepPilotID != nil {
+		prepPilotID, err := primitive.ObjectIDFromHex(*notebook.PrepPilotID)
+		if err != nil {
+			return err
+		}
+		existingNotebook.PrepPilotID = &prepPilotID
 	}
 
 	return u.notebookRepo.Update(existingNotebook)
@@ -149,7 +163,7 @@ func (u *notebookUseCase) GetSnapnotes(userID string, notebookID string) (*domai
 		return nil, errors.New("notebook not found or does not belong to user")
 	}
 
-	if notebook.SnapnotesID == nil {
+	if notebook.SnapnotesID.IsZero() {
 		return nil, errors.New("no snapnotes associated with this notebook")
 	}
 
@@ -176,7 +190,7 @@ func (u *notebookUseCase) GetPrepPilot(userID string, notebookID string) (*domai
 		return nil, errors.New("notebook not found or does not belong to user")
 	}
 
-	if notebook.PrepPilotID == nil {
+	if notebook.PrepPilotID.IsZero() {
 		return nil, errors.New("no prep pilot associated with this notebook")
 	}
 

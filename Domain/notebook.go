@@ -21,11 +21,13 @@ type Notebook struct {
 }
 
 type UpdateRequest struct {
-	Name            string  `json:"name"`
-	Icon            string  `json:"icon"`
-	Color           string  `json:"color"`
-	Type            string  `json:"type"`
+	Name            *string `json:"name"`
+	Icon            *string `json:"icon"`
+	Color           *string `json:"color"`
+	Type            *string `json:"type"`
 	GoogleDriveLink *string `json:"google_drive_link"`
+	SnapnotesID     *string `json:"snapnotes_id"`
+	PrepPilotID     *string `json:"prep_pilot_id"`
 }
 
 type NotebookRepository interface {
