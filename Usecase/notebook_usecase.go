@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"log"
 
 	domain "cognivia-api/Domain"
 
@@ -185,6 +186,8 @@ func (u *notebookUseCase) GetPrepPilot(userID string, notebookID string) (*domai
 	if err != nil {
 		return nil, err
 	}
+
+	log.Default().Printf("Notebook: %+v", notebook)
 
 	if notebook == nil || notebook.UserID != objectUserID {
 		return nil, errors.New("notebook not found or does not belong to user")

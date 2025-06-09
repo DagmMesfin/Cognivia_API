@@ -30,14 +30,17 @@ func main() {
 	notebookRepo := mongodb.NewNotebookRepository(db)
 	snapnotesRepo := mongodb.NewSnapnotesRepository(db)
 	prepPilotRepo := mongodb.NewPrepPilotRepository(db)
+	testResultRepo := mongodb.NewTestResultRepository(db)
 
 	// Initialize use cases
 	userUseCase := usecase.NewUserUseCase(userRepo)
 	notebookUseCase := usecase.NewNotebookUseCase(notebookRepo, snapnotesRepo, prepPilotRepo)
+	testResultUseCase := usecase.NewTestResultUseCase(testResultRepo, notebookRepo, prepPilotRepo)
 
 	userHandler := controllers.NewUserHandler(userUseCase)
 	notebookHandler := controllers.NewNotebookHandler(notebookUseCase)
-	router := routers.SetupRouter(userHandler, notebookHandler)
+	testResultHandler := controllers.NewTestResultHandler(testResultUseCase)
+	router := routers.SetupRouter(userHandler, notebookHandler, testResultHandler)
 
 	// Get port from environment variable or use default
 	port := os.Getenv("PORT")

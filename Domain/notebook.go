@@ -7,7 +7,7 @@ import (
 )
 
 type Notebook struct {
-	ID              primitive.ObjectID  `bson:"_id,omitempty" json:"id"`
+	ID              primitive.ObjectID  `bson:"_id" json:"id"`
 	UserID          primitive.ObjectID  `bson:"user_id" json:"user_id"`
 	SnapnotesID     *primitive.ObjectID `bson:"snapnotes_id,omitempty" json:"snapnotes_id,omitempty"`
 	PrepPilotID     *primitive.ObjectID `bson:"prep_pilot_id,omitempty" json:"prep_pilot_id,omitempty"`

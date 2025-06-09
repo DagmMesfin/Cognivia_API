@@ -28,6 +28,8 @@ func (r *notebookRepository) Create(notebook *domain.Notebook) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	// Generate new ObjectID for the notebook
+	notebook.ID = primitive.NewObjectID()
 	notebook.CreatedAt = time.Now()
 	notebook.UpdatedAt = time.Now()
 

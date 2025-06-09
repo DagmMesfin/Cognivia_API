@@ -10,6 +10,7 @@ import (
 func SetupRouter(
 	authHandler *controllers.UserHandler,
 	notebookHandler *controllers.NotebookHandler,
+	testResultHandler *controllers.TestResultHandler,
 ) *gin.Engine {
 	router := gin.Default()
 
@@ -33,6 +34,17 @@ func SetupRouter(
 		notebookRoutes.DELETE("/:id", notebookHandler.DeleteNotebook)
 		notebookRoutes.GET("/:id/snapnotes", notebookHandler.GetSnapnotes)
 		notebookRoutes.GET("/:id/prep-pilot", notebookHandler.GetPrepPilot)
+	}
+
+	testResultRoutes := router.Group("/api/v1/test-results")
+	{
+		// Protected routes - require JWT authentication
+		testResultRoutes.Use(infrastructure.JWTAuth())
+		testResultRoutes.POST("/", testResultHandler.SubmitTestResultV2)
+		testResultRoutes.GET("/:id", testResultHandler.GetTestResult)
+		testResultRoutes.GET("/user", testResultHandler.GetUserTestResults)
+		testResultRoutes.GET("/notebook/:notebook_id", testResultHandler.GetNotebookTestResults)
+		testResultRoutes.GET("/notebook/:notebook_id/stats", testResultHandler.GetTestResultStats)
 	}
 
 	return router
